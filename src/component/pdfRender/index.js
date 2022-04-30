@@ -1,3 +1,5 @@
+/** @format */
+
 import React from "react";
 import { Container, Header } from "semantic-ui-react";
 import {
@@ -13,9 +15,6 @@ import Robot from "../../fonts/RobotoCondensedRegular.ttf";
 import RoboLight from "../../fonts/RobotoCondensedLight.ttf";
 import RoboBold from "../../fonts/RobotoCondensedBold.ttf";
 
-{
-  /** Register Font */
-}
 Font.register({
   family: "Roboto",
   src: Robot,
@@ -98,7 +97,9 @@ const styles = StyleSheet.create({
   },
 });
 
-const Contact = () => {
+const Contact = (props) => {
+  const billInfo = props.billingInfo;
+
   return (
     <>
       <Header>PDF Invoice</Header>
@@ -115,26 +116,22 @@ const Contact = () => {
                 <View style={[styles.header, styles.row]}>
                   <View style={[styles.column, styles.cell]}>
                     <Text style={[styles.mainHeading]}>
-                      Harita Industries Factory
+                      {billInfo["enterpriseName"]}
                     </Text>
-                    <Text>
-                      Phase 1, Harita Industries, Plot 59/A, Lane 2, Sector 4, B
-                      N Reddy Nagar, Cherlapalli, Secunderabad, Telangana
-                      500051.
-                    </Text>
+                    <Text>{billInfo["enterpriseAddress"]}</Text>
                   </View>
                   <View style={[styles.column, styles.cell]}>
                     <Text style={{ margin: 2, padding: 2 }}>
                       Co. No : 123456789
                     </Text>
                     <Text style={{ margin: 2, padding: 2 }}>
-                      GST ID : 123456789R456
+                      GST ID : {billInfo["enterpriseGstin"]}
                     </Text>
                     <Text style={{ margin: 2, padding: 2 }}>
-                      Phone : 123456789
+                      Phone : {billInfo["enterprisePhoneNumber"]}
                     </Text>
                     <Text style={{ margin: 2, padding: 2 }}>
-                      Mail : maturikarthik@gmail.com
+                      Mail : {billInfo["enterpriseEmail"]}
                     </Text>
                   </View>
                 </View>
@@ -153,20 +150,16 @@ const Contact = () => {
                 <View style={[styles.row]}>
                   <View style={[styles.column, styles.cell]}>
                     <Text style={[styles.mainHeading]}>Bill To :</Text>
-                    <Text>
-                      Phase 1, Harita Industries, Plot 59/A, Lane 2, Sector 4, B
-                      N Reddy Nagar, Cherlapalli, Secunderabad, Telangana
-                      500051.
-                    </Text>
+                    <Text>{billInfo["shippingAddress"]}</Text>
                     <View style={[styles.column, styles.cell]}>
                       <Text style={{ margin: 1, padding: 1 }}>
-                        GST ID: 200000/24567
+                        GST ID: {billInfo["gstin"]}
                       </Text>
                       <Text style={{ margin: 1, padding: 1 }}>
-                        Co .Reg: 200000/24567
+                        Contact Name: {billInfo["name"]}
                       </Text>
                       <Text style={{ margin: 1, padding: 1 }}>
-                        Tel: 7671015245
+                        Tel: {billInfo["phone"]}
                       </Text>
                     </View>
                   </View>
@@ -176,13 +169,13 @@ const Contact = () => {
                       Invoice No: VJ20130801
                     </Text>
                     <Text style={{ margin: 2, padding: 2 }}>
-                      Invoice Date: 09-03-2018
+                      Invoice Date: {billInfo["invoiceDate"]}
                     </Text>
                     <Text style={{ margin: 2, padding: 2 }}>
                       Payment Term: 21 days
                     </Text>
                     <Text style={{ margin: 2, padding: 2 }}>
-                      Due Date: 12-03-2018
+                      Due Date: {billInfo["dueDate"]}
                     </Text>
                   </View>
                 </View>
@@ -206,28 +199,30 @@ const Contact = () => {
                   }}
                 />
                 {/** Table Content */}
-                <View style={[styles.row]}>
-                  <Text style={[styles.tableCell]}>1 .</Text>
-                  <Text style={[styles.tableCell]}>
-                    Pet Bottle Grinding Grinding
-                  </Text>
-                  <Text style={[styles.tableCell]}>36 Kg</Text>
-                  <Text style={[styles.tableCell]}>Tx</Text>
-                  <Text style={[styles.tableCell]}>35.0</Text>
-                  <Text style={[styles.tableCell]}>0.0</Text>
-                  <Text style={[styles.tableCell]}>14,000</Text>
-                </View>
-                <View style={[styles.row]}>
-                  <Text style={[styles.tableCell]}>2 .</Text>
-                  <Text style={[styles.tableCell]}>
-                    Pet Bottle Fine Grinding
-                  </Text>
-                  <Text style={[styles.tableCell]}>48 Kg</Text>
-                  <Text style={[styles.tableCell]}>Tx</Text>
-                  <Text style={[styles.tableCell]}>35.0</Text>
-                  <Text style={[styles.tableCell]}>0.0</Text>
-                  <Text style={[styles.tableCell]}>34,000</Text>
-                </View>
+                {billInfo["itemLists"].map((data, index) => {
+                  return (
+                    <View style={[styles.row]} key={index}>
+                      <Text style={[styles.tableCell]}>{index + 1} .</Text>
+                      <Text style={[styles.tableCell]}>
+                        {data["description"]}
+                      </Text>
+                      <Text style={[styles.tableCell]}>
+                        {data["qty"] + data["unit"]}
+                      </Text>
+                      <Text style={[styles.tableCell]}>Tx</Text>
+                      <Text style={[styles.tableCell]}>
+                        {data["price"]}/{data["unit"]}
+                      </Text>
+                      <Text style={[styles.tableCell]}>
+                        {data["discount"]}%
+                      </Text>
+                      <Text style={[styles.tableCell]}>
+                        {data["netAmount"]}
+                      </Text>
+                    </View>
+                  );
+                })}
+
                 {/**EOD - Table Content */}
 
                 {/** Row - 6 Border */}
@@ -244,7 +239,9 @@ const Contact = () => {
                   <Text style={[styles.tableCell]}></Text>
                   <Text style={[styles.tableCell]}>Net Total(Excl.GST)</Text>
                   <Text style={[styles.tableCell]}></Text>
-                  <Text style={[styles.tableCell]}>45000</Text>
+                  <Text style={[styles.tableCell]}>
+                    {billInfo["taxableAmount"]}
+                  </Text>
                 </View>
                 {/** Row - 9  */}
                 {/** Row - 6 Border */}
@@ -254,9 +251,13 @@ const Contact = () => {
                   <Text style={[styles.tableCell]}></Text>
                   <Text style={[styles.tableCell]}></Text>
                   <Text style={[styles.tableCell]}></Text>
-                  <Text style={[styles.tableCell]}>GST Tax@(6%)</Text>
+                  <Text style={[styles.tableCell]}>
+                    GST Tax@({billInfo["gst"]}%)
+                  </Text>
                   <Text style={[styles.tableCell]}></Text>
-                  <Text style={[styles.tableCell]}>180</Text>
+                  <Text style={[styles.tableCell]}>
+                    {billInfo["gstAmount"]}
+                  </Text>
                 </View>
 
                 {/** Row - 6 Border */}
@@ -274,7 +275,9 @@ const Contact = () => {
                   <Text style={[styles.tableCell]}></Text>
                   <Text style={[styles.tableTitle]}>Total(Incl GST.)</Text>
                   <Text style={[styles.tableCell]}></Text>
-                  <Text style={[styles.tableTitle]}>180000</Text>
+                  <Text style={[styles.tableTitle]}>
+                    {billInfo["totalAmount"]}
+                  </Text>
                 </View>
               </View>
               {/** Footer */}
@@ -282,14 +285,16 @@ const Contact = () => {
                 <View style={styles.tableOnlyColumn}>
                   <Text style={styles.footer}>Authorized Signature .</Text>
                   <View
-                    style={[styles.row]}
-                    style={{
-                      height: 10,
-                      width: "100vw",
-                      padding: 2,
-                      marginTop: 6,
-                      borderTop: "2px solid black",
-                    }}
+                    style={[
+                      styles.row,
+                      {
+                        height: 10,
+                        width: "100vw",
+                        padding: 2,
+                        marginTop: 6,
+                        borderTop: "2px solid black",
+                      },
+                    ]}
                   ></View>
                   <Text>
                     Terms & condition :Payment of undisputed amounts shall be

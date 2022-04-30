@@ -1,110 +1,100 @@
-import React, { useState } from "react";
+/** @format */
+
+import React, { useContext } from "react";
 import {
-  Container,
   Dropdown,
   Form,
   Input,
   Label,
-  Segment,
   TextArea,
-  Header,
+  Grid,
 } from "semantic-ui-react";
+import BillingContext from "./BillingContext";
 
-const CustomerForm = (props) => {
-  const date = new Date();
-  const today = String(
-    date.getFullYear() +
-      "-" +
-      (date.getMonth() > 9
-        ? date.getMonth() + 1
-        : "0" + (date.getMonth() + 1)) +
-      "-" +
-      date.getDate()
-  );
-  const [invoiceDate, setInvoiceDate] = useState(today);
+const CustomerForm = () => {
+  const { customer, setCustomer, customerList } = useContext(BillingContext);
 
-  console.log(today);
+  const OpenCustomerSideBar = (event) => {
+    console.log("Open Side bar  disabled");
+  };
 
-  const GetDate = (event) => {
-    setInvoiceDate(event.target.value);
+  const handleOnChange = (event) => {
+    const keyName = event.target.name;
+    const value = event.target.value;
+    customer[keyName] = value;
+    setCustomer({ ...customer });
   };
 
   return (
     <>
-      <Form>
-        <Form.Group>
-          <Form.Field>
-            <label>Select Customer</label>
-            <Dropdown
-              clearable
-              multiple
-              search
-              selection
-              options={props.customerList}
-              placeholder="Search Customer"
-            />
-          </Form.Field>
-          <Form.Field>
-            <label>Invoice Date</label>
-            <Input
-              type="date"
-              value={invoiceDate}
-              onChange={(event) => GetDate(event)}
-            />
-          </Form.Field>
-          <Form.Field>
-            <label>Due Date</label>
-            <Input type="date" />
-          </Form.Field>
-          <Form.Field control={TextArea} label="Reference"></Form.Field>
-        </Form.Group>
-      </Form>
-      {/** 
-      <Container text>
-        <Segment raised placeholder size="small">
-          <Form>
-            <Form.Group widths={"equal"}>
+      <Form size="small">
+        <Grid>
+          <Grid.Row columns={"equal"}>
+            <Grid.Column>
+              <Label as={"a"} onClick={OpenCustomerSideBar}>
+                Add New Customer
+              </Label>
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row columns={"equal"}>
+            <Grid.Column>
               <Form.Field>
-                <Form.Group inline>
-                  <label>Select Customer</label>
-                  <label
-                    style={{
-                      fontSize: "8.5px",
-                      color: "#9acd32",
-                      height: "15px",
-                    }}
-                    onClick={props.displaySideBar}
-                  >
-                    Add New Customer
-                  </label>
-                </Form.Group>
-
+                <label>Select Customer </label>
                 <Dropdown
+                  fluid
                   clearable
-                  multiple
                   search
                   selection
-                  options={props.customerList}
+                  options={customerList}
                   placeholder="Search Customer"
+                  onChange={(event, data) => {
+                    if (data.value !== "") {
+                      //setCustomerDetail(JSON.parse(data.value));
+                      const value = JSON.parse(data.value);
+                      setCustomer({ ...value, ...customer });
+                    }
+                  }}
                 />
               </Form.Field>
+            </Grid.Column>
+
+            <Grid.Column>
               <Form.Field>
-                <label>Invoice Date </label>
-                <Input type="date" size="small" />
+                <label>Invoice Date</label>
+                <Input
+                  type="date"
+                  name="invoiceDate"
+                  value={customer["invoiceDate"]}
+                  onChange={(event) => handleOnChange(event)}
+                />
               </Form.Field>
+            </Grid.Column>
+            <Grid.Column>
               <Form.Field>
-                <label>Due Date </label>
-                <Input type="date" size="small" />
+                <label>Due Date</label>
+                <Input
+                  type="date"
+                  name="dueDate"
+                  value={customer["dueDate"]}
+                  onChange={(event) => handleOnChange(event)}
+                />
               </Form.Field>
+            </Grid.Column>
+            <Grid.Column>
               <Form.Field>
                 <label>Reference</label>
-                <TextArea placeholder="Any text,PO Number etc." rows={2} />
+                <TextArea
+                  rows={1}
+                  placeholder="Any text ...etc"
+                  name="refText"
+                  value={customer["refText"]}
+                  onChange={(event) => handleOnChange(event)}
+                />
               </Form.Field>
-            </Form.Group>
-          </Form>
-        </Segment>
-      </Container>
-      */}
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </Form>
     </>
   );
 };

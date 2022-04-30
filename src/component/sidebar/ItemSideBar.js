@@ -1,3 +1,5 @@
+/** @format */
+
 import React from "react";
 import {
   Sidebar,
@@ -7,7 +9,6 @@ import {
   Menu,
   Header,
   Icon,
-  Checkbox,
   Divider,
   Visibility,
   Button,

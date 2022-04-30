@@ -1,3 +1,5 @@
+/** @format */
+
 import React, { useEffect, useState } from "react";
 import {
   Sidebar,
@@ -67,7 +69,6 @@ const CustomerSideBar = (props) => {
   const sendCustomerInfo = (event) => {
     switch (true) {
       case customer.name === "" && customer.phone === "":
-        console.log("here");
         setErr({ errName: true, errPhone: true });
         break;
       case customer.name === "":
@@ -78,7 +79,25 @@ const CustomerSideBar = (props) => {
         break;
 
       default:
-        props.customerSideBarHandler(customer);
+        const customerObject = {
+          name: customer.name,
+          phone: customer.phone,
+          email: customer.email,
+          gstin: customer.gstin,
+          company: customer.company,
+          address: customer.baddress1
+            .concat("\n" + customer.baddress2 + "\n")
+            .concat(customer.bcity + "\n")
+            .concat(customer.bcstate + "\n")
+            .concat(customer.bpincode + "\n"),
+          shippingAddress: customer.saddress1
+            .concat("\n" + customer.saddress2 + "\n")
+            .concat(customer.scity + "\n")
+            .concat(customer.scstate + "\n")
+            .concat(customer.spincode + "\n"),
+        };
+
+        props.customerSideBarHandler(customerObject);
         setCustomer({
           name: "",
           phone: "",
@@ -344,6 +363,7 @@ const CustomerSideBar = (props) => {
                         <Form.Field>
                           <Dropdown
                             search
+                            selection
                             options={stateOptions}
                             placeholder="Select your State"
                             value={customer.bcstate}

@@ -1,12 +1,12 @@
+/** @format */
+
 import React from "react";
 import { Container, Menu, MenuItem, Image } from "semantic-ui-react";
 import Logo from "../../assets/image.png";
 import { Link } from "react-router-dom";
 
 const Nav = () => {
-  const itemClick = (e, { name }) => {
-    console.log(name);
-  };
+  const itemClick = (e, { name }) => {};
 
   return (
     <>
@@ -24,11 +24,14 @@ const Nav = () => {
           >
             Home
           </Menu.Item>
-          <Menu.Item as={Link} to="/contact" name="Contact" onClick={itemClick}>
-            Contact Us
+          <Menu.Item as={Link} to="/test" name="Contact" onClick={itemClick}>
+            Test Concept
           </Menu.Item>
           <Menu.Item as={Link} to="/billing" name="Billing" onClick={itemClick}>
             Billing
+          </Menu.Item>
+          <Menu.Item as={Link} to="/profile" name="profile" onClick={itemClick}>
+            Profile
           </Menu.Item>
         </Menu>
       </Container>

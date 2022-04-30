@@ -1,11 +1,17 @@
+/** @format */
+
 import React, { useEffect, useState } from "react";
 import Nav from "./component/Nav";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Billing from "./component/billing";
-import ItemSideBar from "./component/billing/ItemSideBar";
+import ItemSideBar from "./component/sidebar/ItemSideBar";
 import { Sidebar, Segment } from "semantic-ui-react";
-import CustomerSideBar from "./component/billing/CustomerSideBar";
+import CustomerSideBar from "./component/sidebar/CustomerSideBar";
 import { v4 as uuid_v4 } from "uuid";
+import Contact from "./component/pdfRender";
+import Profile from "./component/profile";
+
+import productTestData from "./component/model/ProductTestData";
 
 function App(props) {
   const CUSTOMER_LIST_KEY = "Customer_List";
@@ -13,18 +19,16 @@ function App(props) {
   const [show, showSideBar] = useState(false);
   const [showP, showPSideBar] = useState(false);
   const [dim, showDim] = useState(false);
-  const storedCustomerData = JSON.parse(
-    localStorage.getItem(CUSTOMER_LIST_KEY)
-  );
-
-  const [customerList, setCustomerList] = useState(
-    storedCustomerData.length > 0 ? [...storedCustomerData] : []
-  );
+  const [billingInfo, setBillingInfo] = useState();
+  const [customerList, setCustomerList] = useState(() => {
+    const localCustomerStorage = localStorage.getItem(CUSTOMER_LIST_KEY);
+    return localCustomerStorage ? JSON.parse(localCustomerStorage) : [];
+  });
 
   const customerSideBarHandler = (data) => {
     showSideBar(!show);
     showDimm();
-    if (data != undefined) {
+    if (data !== undefined) {
       const customerListObj = {
         key: uuid_v4(),
         value: JSON.stringify(data),
@@ -32,6 +36,11 @@ function App(props) {
       };
 
       setCustomerList([...customerList, customerListObj]);
+      /** Store customer to LocalStora */
+      localStorage.setItem(
+        CUSTOMER_LIST_KEY,
+        JSON.stringify([...customerList, customerListObj])
+      );
     }
   };
 
@@ -44,14 +53,17 @@ function App(props) {
     showDim(!dim);
   };
 
-  /** Store customer to LocalStora */
-  useEffect(() => {
-    //console.log(customerList);
+  useEffect(() => {}, [customerList, billingInfo]);
 
-    if (customerList.length > 0) {
-      localStorage.setItem(CUSTOMER_LIST_KEY, JSON.stringify(customerList));
-    }
-  }, [customerList]);
+  const fetchBillingInfoHandler = (data) => {
+    const storedCompanyProfile = JSON.parse(
+      localStorage.getItem("company_info")
+    );
+    setBillingInfo({
+      ...storedCompanyProfile,
+      ...data,
+    });
+  };
 
   return (
     <>
@@ -73,15 +85,24 @@ function App(props) {
             <Nav />
             <Switch>
               <Route
+                path="/billing"
                 render={(props) => (
                   <Billing
                     customerSideBarHandler={customerSideBarHandler}
                     productSideBarHandler={productSideBarHandler}
                     customerList={customerList}
+                    productsList={productTestData}
+                    fetchBillingInfoHandler={fetchBillingInfoHandler}
                   />
                 )}
               />
+              <Route path={"/profile"} render={(props) => <Profile />} />
             </Switch>
+            {billingInfo !== undefined ? (
+              <Contact billingInfo={billingInfo} />
+            ) : (
+              ""
+            )}
           </Sidebar.Pusher>
         </Sidebar.Pushable>
       </BrowserRouter>
