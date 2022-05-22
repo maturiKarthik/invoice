@@ -2,21 +2,17 @@
 
 import React, { useState } from "react";
 import { Modal, Button } from "semantic-ui-react";
+import PdfTemplate from "../pdfRender";
 
-const Message = (props) => {
+const Message = () => {
   const [dimmer, setDimmer] = useState(true);
-  console.log(props.open);
+  console.log("Message rendered");
   return (
     <>
-      <Modal
-        dimmer={dimmer}
-        open={props.open}
-        onClose={() => setDimmer(!dimmer)}
-      >
+      <Modal dimmer={dimmer} open={true} onClose={() => setDimmer(!dimmer)}>
         <Modal.Header>Use Google's location service?</Modal.Header>
         <Modal.Content>
-          Let Google help apps determine location. This means sending anonymous
-          location data to Google, even when no apps are running.
+          <PdfTemplate />
         </Modal.Content>
         <Modal.Actions>
           <Button negative>Disagree</Button>

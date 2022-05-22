@@ -1,6 +1,6 @@
 /** @format */
 
-import React from "react";
+import React, { useContext, useState } from "react";
 import {
   Sidebar,
   Grid,
@@ -16,10 +16,48 @@ import {
   TextArea,
   Form,
 } from "semantic-ui-react";
+import { AppContext } from "../AppContext";
+import { v4 as uuid_v4 } from "uuid";
+import { productInitialState } from "../model/initialState";
 
-const ProductSideBar = (props) => {
+const ProductSideBar = () => {
+  const {
+    PRODUCT_LIST_KEY,
+    productList,
+    setProductList,
+    productSideBar,
+    showProductSideBar,
+    dim,
+    showDim,
+  } = useContext(AppContext);
+  const [product, setProduct] = useState(productInitialState);
+
   const toggleSideBar = () => {
-    props.productSideBarHandler();
+    showProductSideBar(!productSideBar);
+    showDim(!dim);
+  };
+
+  const handleOnchange = (event) => {
+    let key = event.target.name;
+    let value = event.target.value;
+    product[key] = value;
+    setProduct({ ...product });
+  };
+
+  const addItem = (event) => {
+    console.log("Enterd here");
+    const productListObj = {
+      key: uuid_v4(),
+      value: JSON.stringify(product),
+      text: product["itemName"],
+    };
+    localStorage.setItem(
+      PRODUCT_LIST_KEY,
+      JSON.stringify([...productList, productListObj])
+    );
+    setProductList([...productList, productListObj]);
+    showProductSideBar(!productSideBar);
+    showDim(!dim);
   };
 
   return (
@@ -28,7 +66,7 @@ const ProductSideBar = (props) => {
       <Sidebar
         as={Menu}
         animation="overlay"
-        visible={props.show}
+        visible={productSideBar}
         width="very wide"
         direction="right"
         vertical
@@ -74,7 +112,13 @@ const ProductSideBar = (props) => {
                   </Grid.Column>
                   <Grid.Column>
                     <Form.Field>
-                      <Input type="text" placeholder="Enter Item Name" />
+                      <Input
+                        type="text"
+                        placeholder="Enter Item Name"
+                        name="itemName"
+                        value={product["itemName"]}
+                        onChange={(event) => handleOnchange(event)}
+                      />
                     </Form.Field>
                   </Grid.Column>
                 </Grid.Row>
@@ -96,6 +140,9 @@ const ProductSideBar = (props) => {
                         iconPosition="left"
                         type="text"
                         placeholder="100"
+                        name="price"
+                        value={product["price"]}
+                        onChange={(event) => handleOnchange(event)}
                       />
                     </Form.Field>
                   </Grid.Column>
@@ -119,7 +166,30 @@ const ProductSideBar = (props) => {
                   <Grid.Column>
                     <Form.Field>
                       {" "}
-                      <Input type="text" placeholder="2273546838467" />
+                      <Input
+                        type="text"
+                        placeholder="2273546838467"
+                        name="barcode"
+                        value={product["barcode"]}
+                        onChange={(event) => handleOnchange(event)}
+                      />
+                    </Form.Field>
+                  </Grid.Column>
+                </Grid.Row>
+                <Grid.Row columns={2}>
+                  <Grid.Column>
+                    <label>Unit:</label>
+                  </Grid.Column>
+                  <Grid.Column>
+                    <Form.Field>
+                      {" "}
+                      <Input
+                        type="text"
+                        placeholder="Kg ,m ,litres etc"
+                        name="unit"
+                        value={product["unit"]}
+                        onChange={(event) => handleOnchange(event)}
+                      />
                     </Form.Field>
                   </Grid.Column>
                 </Grid.Row>
@@ -133,6 +203,8 @@ const ProductSideBar = (props) => {
                       <Input
                         type="text"
                         placeholder="Enter Purchase Price inclusice Of Tax"
+                        name="price"
+                        value={product["price"]}
                       />
                     </Form.Field>
                   </Grid.Column>
@@ -146,6 +218,9 @@ const ProductSideBar = (props) => {
                       <TextArea
                         rows={2}
                         placeholder="Product description eg: 1Box[32 Pieces]"
+                        name="description"
+                        value={product["description"]}
+                        onChange={(event) => handleOnchange(event)}
                       />
                     </Form.Field>
                   </Grid.Column>
@@ -153,7 +228,11 @@ const ProductSideBar = (props) => {
 
                 <Grid.Row>
                   <Grid.Column>
-                    <Button primary size={"tiny"}>
+                    <Button
+                      primary
+                      size={"tiny"}
+                      onClick={(event) => addItem(event)}
+                    >
                       Add Item
                     </Button>
                     <Button basic onClick={toggleSideBar} size={"tiny"}>

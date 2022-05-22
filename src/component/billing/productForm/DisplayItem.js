@@ -2,10 +2,41 @@
 
 import React, { useContext } from "react";
 import { Header, Icon, Table, Input, Form, Button } from "semantic-ui-react";
-import BillingContext from "../BillingContext";
+import { AppContext } from "../../AppContext";
 
 const DisplayItem = () => {
-  const { billingInfo, dispatch } = useContext(BillingContext);
+  const { pdfRenderInfo, dispatch } = useContext(AppContext);
+  const billingInfo = pdfRenderInfo["itemLists"];
+  const removeItem = (event, itemIndex) => {
+    const newItemList = pdfRenderInfo["itemLists"].filter(
+      (data, index) => index !== itemIndex
+    );
+    pdfRenderInfo["itemLists"] = newItemList;
+    dispatch({
+      type: "removeItemFromList",
+      value: { ...pdfRenderInfo },
+    });
+  };
+
+  const handleOnUpdate = (event, index, productKey) => {
+    const itemList = pdfRenderInfo["itemLists"];
+    const element = itemList[index];
+    element[productKey] = parseInt(event.target.value);
+    const totalPrice = element["qty"] * element["price"];
+    const discountPrice = (totalPrice / 100) * element["discount"];
+    element["discountAmount"] = parseFloat(
+      Math.round(discountPrice * 100) / 100
+    );
+    element["netAmount"] = parseFloat(totalPrice - discountPrice);
+    itemList[index] = element;
+    pdfRenderInfo["itemLists"] = [...itemList];
+    dispatch({
+      type: "updateItemInList",
+      itemIndex: index,
+      value: { ...pdfRenderInfo },
+      productKey: "qty",
+    });
+  };
 
   return (
     <>
@@ -35,7 +66,7 @@ const DisplayItem = () => {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {billingInfo["itemLists"].map((data, index) => {
+          {billingInfo.map((data, index) => {
             return (
               <Table.Row key={index}>
                 <Table.Cell>
@@ -48,31 +79,19 @@ const DisplayItem = () => {
                     min={0}
                     placeholder={0}
                     value={data["qty"]}
-                    onChange={(event) => {
-                      dispatch({
-                        type: "update",
-                        itemIndex: index,
-                        value: parseFloat(event.target.value),
-                        productKey: "qty",
-                      });
-                    }}
+                    onChange={(event) => handleOnUpdate(event, index, "qty")}
                   />
                 </Table.Cell>
                 <Table.Cell>
                   <Form.Field>
-                    <input
+                    <Input
                       type={"number"}
                       min={0}
                       placeholder={0}
                       value={data["price"]}
-                      onChange={(event) => {
-                        dispatch({
-                          type: "update",
-                          itemIndex: index,
-                          value: parseFloat(event.target.value),
-                          productKey: "price",
-                        });
-                      }}
+                      onChange={(event) =>
+                        handleOnUpdate(event, index, "price")
+                      }
                     />
                   </Form.Field>
                 </Table.Cell>
@@ -83,14 +102,7 @@ const DisplayItem = () => {
                     placeholder={0}
                     type="number"
                     value={data["price"]}
-                    onChange={(event) =>
-                      dispatch({
-                        type: "update",
-                        itemIndex: index,
-                        value: parseFloat(event.target.value),
-                        productKey: "price",
-                      })
-                    }
+                    onChange={(event) => handleOnUpdate(event, index, "price")}
                   />
                 </Table.Cell>
                 <Table.Cell>
@@ -101,12 +113,7 @@ const DisplayItem = () => {
                     placeholder={0}
                     value={data["discount"]}
                     onChange={(event) =>
-                      dispatch({
-                        type: "update",
-                        itemIndex: index,
-                        value: parseFloat(event.target.value),
-                        productKey: "discount",
-                      })
+                      handleOnUpdate(event, index, "discount")
                     }
                   />
                 </Table.Cell>
@@ -125,9 +132,7 @@ const DisplayItem = () => {
                 </Table.Cell>
                 <Table.Cell>
                   <Button
-                    onClick={(event) =>
-                      dispatch({ type: "remove", value: index })
-                    }
+                    onClick={(event) => removeItem(event, index)}
                     size="mini"
                     icon="trash alternate outline"
                     style={{ color: "red" }}

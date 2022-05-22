@@ -9,20 +9,37 @@ import {
   TextArea,
   Grid,
 } from "semantic-ui-react";
-import BillingContext from "./BillingContext";
+import { AppContext } from "../AppContext";
 
 const CustomerForm = () => {
-  const { customer, setCustomer, customerList } = useContext(BillingContext);
+  const {
+    pdfRenderInfo,
+    dispatch,
+    customerList,
+    customerSideBar,
+    showCustomerSideBar,
+    dim,
+    showDim,
+  } = useContext(AppContext);
 
   const OpenCustomerSideBar = (event) => {
-    console.log("Open Side bar  disabled");
+    showCustomerSideBar(!customerSideBar);
+    showDim(!dim);
   };
 
   const handleOnChange = (event) => {
     const keyName = event.target.name;
     const value = event.target.value;
-    customer[keyName] = value;
-    setCustomer({ ...customer });
+    pdfRenderInfo[keyName] = value;
+    dispatch({
+      type: "insert",
+      value: { ...pdfRenderInfo },
+    });
+  };
+
+  const handleOnCustomerChange = (data) => {
+    pdfRenderInfo["customerDetail"] = data;
+    dispatch({ type: "insert", value: { ...pdfRenderInfo } });
   };
 
   return (
@@ -48,10 +65,10 @@ const CustomerForm = () => {
                   options={customerList}
                   placeholder="Search Customer"
                   onChange={(event, data) => {
-                    if (data.value !== "") {
-                      //setCustomerDetail(JSON.parse(data.value));
-                      const value = JSON.parse(data.value);
-                      setCustomer({ ...value, ...customer });
+                    if (data.value === "") handleOnCustomerChange({});
+                    else {
+                      const customerDetail = JSON.parse(data.value);
+                      handleOnCustomerChange(customerDetail);
                     }
                   }}
                 />
@@ -64,7 +81,7 @@ const CustomerForm = () => {
                 <Input
                   type="date"
                   name="invoiceDate"
-                  value={customer["invoiceDate"]}
+                  value={pdfRenderInfo["invoiceDate"]}
                   onChange={(event) => handleOnChange(event)}
                 />
               </Form.Field>
@@ -75,7 +92,7 @@ const CustomerForm = () => {
                 <Input
                   type="date"
                   name="dueDate"
-                  value={customer["dueDate"]}
+                  value={pdfRenderInfo["dueDate"]}
                   onChange={(event) => handleOnChange(event)}
                 />
               </Form.Field>
@@ -87,7 +104,7 @@ const CustomerForm = () => {
                   rows={1}
                   placeholder="Any text ...etc"
                   name="refText"
-                  value={customer["refText"]}
+                  value={pdfRenderInfo["refText"]}
                   onChange={(event) => handleOnChange(event)}
                 />
               </Form.Field>

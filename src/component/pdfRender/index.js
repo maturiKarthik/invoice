@@ -1,6 +1,6 @@
 /** @format */
 
-import React from "react";
+import React, { useContext } from "react";
 import { Container, Header } from "semantic-ui-react";
 import {
   Document,
@@ -14,6 +14,7 @@ import {
 import Robot from "../../fonts/RobotoCondensedRegular.ttf";
 import RoboLight from "../../fonts/RobotoCondensedLight.ttf";
 import RoboBold from "../../fonts/RobotoCondensedBold.ttf";
+import { AppContext } from "../AppContext";
 
 Font.register({
   family: "Roboto",
@@ -97,8 +98,11 @@ const styles = StyleSheet.create({
   },
 });
 
-const Contact = (props) => {
-  const billInfo = props.billingInfo;
+const PdfTemplate = (props) => {
+  const { pdfRenderInfo } = useContext(AppContext);
+  const enterprise = pdfRenderInfo["enterpriseDetails"];
+  const customerDetail = pdfRenderInfo["customerDetail"];
+  console.log("Billing Info", pdfRenderInfo);
 
   return (
     <>
@@ -116,22 +120,22 @@ const Contact = (props) => {
                 <View style={[styles.header, styles.row]}>
                   <View style={[styles.column, styles.cell]}>
                     <Text style={[styles.mainHeading]}>
-                      {billInfo["enterpriseName"]}
+                      {enterprise["enterpriseName"]}
                     </Text>
-                    <Text>{billInfo["enterpriseAddress"]}</Text>
+                    <Text>{enterprise["enterpriseAddress"]}</Text>
                   </View>
                   <View style={[styles.column, styles.cell]}>
                     <Text style={{ margin: 2, padding: 2 }}>
                       Co. No : 123456789
                     </Text>
                     <Text style={{ margin: 2, padding: 2 }}>
-                      GST ID : {billInfo["enterpriseGstin"]}
+                      GST ID : {enterprise["enterpriseGstin"]}
                     </Text>
                     <Text style={{ margin: 2, padding: 2 }}>
-                      Phone : {billInfo["enterprisePhoneNumber"]}
+                      Phone : {enterprise["enterprisePhoneNumber"]}
                     </Text>
                     <Text style={{ margin: 2, padding: 2 }}>
-                      Mail : {billInfo["enterpriseEmail"]}
+                      Mail : {enterprise["enterpriseEmail"]}
                     </Text>
                   </View>
                 </View>
@@ -150,16 +154,16 @@ const Contact = (props) => {
                 <View style={[styles.row]}>
                   <View style={[styles.column, styles.cell]}>
                     <Text style={[styles.mainHeading]}>Bill To :</Text>
-                    <Text>{billInfo["shippingAddress"]}</Text>
+                    <Text>{customerDetail["shippingAddress"]}</Text>
                     <View style={[styles.column, styles.cell]}>
                       <Text style={{ margin: 1, padding: 1 }}>
-                        GST ID: {billInfo["gstin"]}
+                        GST ID: {customerDetail["gstin"]}
                       </Text>
                       <Text style={{ margin: 1, padding: 1 }}>
-                        Contact Name: {billInfo["name"]}
+                        Contact Name: {customerDetail["name"]}
                       </Text>
                       <Text style={{ margin: 1, padding: 1 }}>
-                        Tel: {billInfo["phone"]}
+                        Tel: {customerDetail["phone"]}
                       </Text>
                     </View>
                   </View>
@@ -169,13 +173,13 @@ const Contact = (props) => {
                       Invoice No: VJ20130801
                     </Text>
                     <Text style={{ margin: 2, padding: 2 }}>
-                      Invoice Date: {billInfo["invoiceDate"]}
+                      Invoice Date: {pdfRenderInfo["invoiceDate"]}
                     </Text>
                     <Text style={{ margin: 2, padding: 2 }}>
                       Payment Term: 21 days
                     </Text>
                     <Text style={{ margin: 2, padding: 2 }}>
-                      Due Date: {billInfo["dueDate"]}
+                      Due Date: {pdfRenderInfo["dueDate"]}
                     </Text>
                   </View>
                 </View>
@@ -198,8 +202,8 @@ const Contact = (props) => {
                     borderBottomWidth: 2,
                   }}
                 />
-                {/** Table Content */}
-                {billInfo["itemLists"].map((data, index) => {
+                {/** Table Content **/}
+                {pdfRenderInfo["itemLists"].map((data, index) => {
                   return (
                     <View style={[styles.row]} key={index}>
                       <Text style={[styles.tableCell]}>{index + 1} .</Text>
@@ -240,7 +244,7 @@ const Contact = (props) => {
                   <Text style={[styles.tableCell]}>Net Total(Excl.GST)</Text>
                   <Text style={[styles.tableCell]}></Text>
                   <Text style={[styles.tableCell]}>
-                    {billInfo["taxableAmount"]}
+                    {pdfRenderInfo["taxableAmount"]}
                   </Text>
                 </View>
                 {/** Row - 9  */}
@@ -252,11 +256,11 @@ const Contact = (props) => {
                   <Text style={[styles.tableCell]}></Text>
                   <Text style={[styles.tableCell]}></Text>
                   <Text style={[styles.tableCell]}>
-                    GST Tax@({billInfo["gst"]}%)
+                    GST Tax@({pdfRenderInfo["gst"]}%)
                   </Text>
                   <Text style={[styles.tableCell]}></Text>
                   <Text style={[styles.tableCell]}>
-                    {billInfo["gstAmount"]}
+                    {pdfRenderInfo["gstAmount"]}
                   </Text>
                 </View>
 
@@ -276,7 +280,7 @@ const Contact = (props) => {
                   <Text style={[styles.tableTitle]}>Total(Incl GST.)</Text>
                   <Text style={[styles.tableCell]}></Text>
                   <Text style={[styles.tableTitle]}>
-                    {billInfo["totalAmount"]}
+                    {pdfRenderInfo["totalAmount"]}
                   </Text>
                 </View>
               </View>
@@ -314,4 +318,4 @@ const Contact = (props) => {
   );
 };
 
-export default Contact;
+export default PdfTemplate;

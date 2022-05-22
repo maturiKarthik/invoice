@@ -1,12 +1,14 @@
 /** @format */
 
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import { Container, Grid, Header } from "semantic-ui-react";
 import ProfileCard from "./ProfileCard";
 import ProfileForm from "./ProfileForm";
 import ProfileContext from "./ProfileContext";
+import { AppContext } from "../AppContext";
 
 const Profile = () => {
+  const { pdfRenderInfo, dispatch } = useContext(AppContext);
   const COMPANY_INFO = "company_info";
   const storedCompanyProfile = localStorage.getItem(COMPANY_INFO);
   const initialState = {
@@ -42,10 +44,14 @@ const Profile = () => {
     }
   };
 
-  const [enterpriseDetails, dispatch] = useReducer(
+  const [enterpriseDetails, enterpriseDispatch] = useReducer(
     reducer,
     storedCompanyProfile ? JSON.parse(storedCompanyProfile) : initialState
   );
+  useEffect(() => {
+    pdfRenderInfo["enterpriseDetails"] = { ...enterpriseDetails };
+    dispatch({ type: "insert", value: { ...pdfRenderInfo } });
+  }, [enterpriseDetails]);
 
   useEffect(() => {}, [ui]);
   return (
@@ -65,7 +71,7 @@ const Profile = () => {
                 value={{
                   buttonText,
                   enterpriseDetails,
-                  dispatch,
+                  enterpriseDispatch,
                 }}
               >
                 {ui ? <ProfileCard /> : <ProfileForm />}

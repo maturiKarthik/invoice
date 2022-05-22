@@ -5,19 +5,19 @@ import { Container, Grid, Form, Input, Button } from "semantic-ui-react";
 import ProfileContext from "./ProfileContext";
 
 const ProfileForm = () => {
-  const { buttonText, enterpriseDetails, dispatch } = useContext(
+  const { buttonText, enterpriseDetails, enterpriseDispatch } = useContext(
     ProfileContext
   );
   const onClickSave = (event) => {
     event.preventDefault();
-    dispatch({ type: "save" });
+    enterpriseDispatch({ type: "save" });
   };
   //  console.log("ProfileFome ->enterprise", enterpriseDetails);
   const handleOnChange = (event) => {
     let keyName = event.target.name;
     let value = event.target.value;
     enterpriseDetails[keyName] = value;
-    dispatch({ type: "onChange", value: { ...enterpriseDetails } });
+    enterpriseDispatch({ type: "onChange", value: { ...enterpriseDetails } });
   };
 
   return (

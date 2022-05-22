@@ -5,16 +5,16 @@ import { Card, Divider, Icon, Button } from "semantic-ui-react";
 import ProfileContext from "./ProfileContext";
 
 const ProfileCard = () => {
-  const { enterpriseDetails, dispatch } = useContext(ProfileContext);
+  const { enterpriseDetails, enterpriseDispatch } = useContext(ProfileContext);
 
   const onDeleteProfile = (event) => {
     event.preventDefault();
-    dispatch({ type: "delete" });
+    enterpriseDispatch({ type: "delete" });
   };
 
   const onEditProfile = (event) => {
     event.preventDefault();
-    dispatch({ type: "update" });
+    enterpriseDispatch({ type: "update" });
   };
 
   return (

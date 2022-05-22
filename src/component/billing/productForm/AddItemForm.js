@@ -2,20 +2,12 @@
 
 import React, { useContext, useState } from "react";
 import { Grid, Form, Icon, Button, Dropdown } from "semantic-ui-react";
-
-import BillingContext from "../BillingContext";
+import { AppContext } from "../../AppContext";
+import { initialItemsList } from "../../model/initialState";
 
 const AddItemForm = () => {
-  const { productList, dispatch } = useContext(BillingContext);
-
-  const initialItemValues = {
-    selectedItem: "",
-    qty: 0,
-    discount: 0,
-    discountAmount: 0,
-    netAmount: 0,
-  };
-  const [item, setItem] = useState(initialItemValues);
+  const { pdfRenderInfo, productList, dispatch } = useContext(AppContext);
+  const [item, setItem] = useState(initialItemsList);
 
   const handleOnChange = (event) => {
     const keyName = event.target.name;
@@ -27,15 +19,16 @@ const AddItemForm = () => {
   const addItem = (event) => {
     item["netAmount"] = item["qty"] * item["price"];
     setItem(item);
+    pdfRenderInfo["itemLists"] = [...pdfRenderInfo["itemLists"], { ...item }];
     dispatch({
-      type: "add",
-      value: { ...item },
+      type: "addItemToList",
+      value: { ...pdfRenderInfo },
     });
     onClear();
   };
 
   const onClear = (event) => {
-    setItem(initialItemValues);
+    setItem(initialItemsList);
   };
 
   return (
@@ -57,7 +50,7 @@ const AddItemForm = () => {
                 item["qty"] = 1;
                 setItem({ ...item, ...itemDetail });
               } else {
-                setItem(initialItemValues);
+                setItem(initialItemsList);
               }
             }}
           />

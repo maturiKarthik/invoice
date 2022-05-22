@@ -1,6 +1,6 @@
 /** @format */
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Sidebar,
   Grid,
@@ -16,28 +16,24 @@ import {
   Form,
   Dropdown,
 } from "semantic-ui-react";
+import { v4 as uuid_v4 } from "uuid";
+import { AppContext } from "../AppContext.js";
+
+import { customerInitialState } from "../model/initialState.js";
 import stateOptions from "../model/StateOptions.js";
 
 const CustomerSideBar = (props) => {
+  const {
+    dim,
+    showDim,
+    customerSideBar,
+    showCustomerSideBar,
+    customerList,
+    setCustomerList,
+    CUSTOMER_LIST_KEY,
+  } = useContext(AppContext);
   const [err, setErr] = useState({ errName: false, errPhone: false });
-  const [customer, setCustomer] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    gstin: "",
-    company: "",
-    baddress1: "",
-    baddress2: "",
-    bcity: "",
-    bcstate: "",
-    bpincode: "",
-    shipping: false,
-    saddress1: "",
-    saddress2: "",
-    scity: "",
-    scstate: "",
-    spincode: "",
-  });
+  const [customer, setCustomer] = useState(customerInitialState);
 
   //Shipping checkbox
   useEffect(() => {
@@ -63,7 +59,8 @@ const CustomerSideBar = (props) => {
   }, [customer.shipping, err]);
 
   const toggleSideBar = () => {
-    props.customerSideBarHandler(undefined);
+    showCustomerSideBar(!customerSideBar);
+    showDim(!dim);
   };
 
   const sendCustomerInfo = (event) => {
@@ -97,25 +94,21 @@ const CustomerSideBar = (props) => {
             .concat(customer.spincode + "\n"),
         };
 
-        props.customerSideBarHandler(customerObject);
-        setCustomer({
-          name: "",
-          phone: "",
-          email: "",
-          gstin: "",
-          company: "",
-          baddress1: "",
-          baddress2: "",
-          bcity: "",
-          bcstate: "",
-          bpincode: "",
-          shipping: false,
-          saddress1: "",
-          saddress2: "",
-          scity: "",
-          scstate: "",
-          spincode: "",
-        });
+        const customerListObj = {
+          key: uuid_v4(),
+          value: JSON.stringify(customerObject),
+          text: customerObject["name"],
+        };
+
+        setCustomerList([...customerList, customerListObj]);
+        /** Store customer to LocalStorage */
+        localStorage.setItem(
+          CUSTOMER_LIST_KEY,
+          JSON.stringify([...customerList, customerListObj])
+        );
+
+        toggleSideBar();
+        setCustomer(customerInitialState);
         setErr({ errName: false, errPhone: false });
     }
   };
@@ -126,7 +119,7 @@ const CustomerSideBar = (props) => {
       <Sidebar
         as={Menu}
         animation="overlay"
-        visible={props.show}
+        visible={customerSideBar}
         width="very wide"
         direction="right"
         vertical
